@@ -1,0 +1,14 @@
+create trigger TR_Basket_insert_update
+on dbo.Basket
+after insert, update
+as
+begin
+
+  update b
+  set DiscountValue = case 
+                        when (select count(*) from inserted where ID_SKU = b.ID_SKU) >= 2 then Value * 0.05
+                              else 0
+                          end
+  from dbo.Basket b
+  inner join inserted as i on i.ID = b.ID;
+end;
